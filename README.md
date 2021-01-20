@@ -1,396 +1,123 @@
-[![Netlify Status](https://api.netlify.com/api/v1/badges/b4aa4a04-e097-4067-87ec-9a6681335673/deploy-status)](https://app.netlify.com/sites/svelte-tailwindcss-storybook/deploys) [![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fjerriclynsjohn%2Fsvelte-storybook-tailwind.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Fjerriclynsjohn%2Fsvelte-storybook-tailwind?ref=badge_shield)
+# Svelte + TailwindCSS 2.0 + RollupJS starter
 
-# A starter template for Svelte, TailwindCSS and Storybook
+Starter template for [Svelte](https://svelte.dev) + [TailwindCSS](https://tailwindcss.com) apps.
 
-![Svelte + TailwindCSS + Storybook Starter Template](starter-template.jpg)
+It has built-in support for TailwindCSS 2.0, while the bundling is handled by Rollup.
 
+There's also a simple dark/light mode switch, and a surprise button 👇
 
-> Visit this website to see the outcome: [Svelte + TailwindCSS + Storybook](https://svelte-tailwindcss-storybook.netlify.com)
+![Light theme](https://user-images.githubusercontent.com/17433578/103722821-7285eb80-4f96-11eb-85d8-07549005b98c.png)
+
+![Dark theme](https://user-images.githubusercontent.com/17433578/103722826-774a9f80-4f96-11eb-97c6-fa4a34587f9b.png)
+
+## 🚨 Limitations
+
+In **development** mode (running `npm run dev` / `yarn dev`), the CSS bundle includes *all* of TailwindCSS and weighs in at ~6.8MB. You don't want to deploy this to production.
+
+In **production** mode (running `npm run build` / `yarn build`), all the unused CSS styles are purged, dropping the bundle to a much more manageable size (~7KB in this case). However, I haven't yet found a way to stop Tailwind from purging dynamic Svelte classes (such as `class:dark` or `class:from-blue-700={$dark}`).
+
+As a result, the production bundle won't contain such dynamic classes. To get around this, in `tailwind.config.js`, under `purge`, add an `options` object with a `safelist` array containing all the classes you wish to protect from purging:
+
+```diff
+purge: {
+    enabled: production,
+    content: [
+        './src/**/*.html',
+        './src/**/*.svelte',
+    ],
+    options: {
+        safelist: [
+            'border-blue-300',
+            'border-orange-500',
+            'border-pink-100',
+            'border-pink-900',
+            'dark',
+            'from-blue-500',
+            'from-blue-700',
+            'from-yellow-200',
+            'text-pink-100',
+            'text-pink-900',
+            'to-blue-800',
+            'to-pink-300',
+            'to-purple-800',
+            'to-yellow-500',
+        ],
+    }
+},
+```
+
+## Get started
+
+Install the dependencies...
 
 ```bash
-// Quickstart
-
-npx degit jerriclynsjohn/svelte-storybook-tailwind my-svelte-project
-cd my-svelte-project
-
-yarn
-yarn dev
-yarn stories
+cd svelte-app
+npm install
 ```
 
-Svelte and TailwindCSS is an awesome combination for Frontend development, but sometimes the setup seems a bit non intuitive, especially when trying to try out this awesome combination. When integrating Storybook, which is another awesome tool for UI Component development and documentation, there is no obvious place to get how it's done. This repo was made to address just that!
-
-> You can easily start your project with this template, instead of wasting time figuring out configurations for each integration.
-
-## What do you get in this repo
-
-![Storybook UI](Storybook-alert-modern.PNG)
-
-1. A fully functional Svelte + TailwindCSS integration with side-by-side implementation of independent Storybook
-2. Storybook with 5 essential Addons
-3. Storybook populated with basic examples of Svelte + TailwindCSS
-
-### Addons
-
-- Accessibility Addon
-
-![Accessibility Addon](storybook-accessibility-addon.PNG)
-
-- Accessibility Addon - Colorblindness Emulation
-
-![Accessibility Addon - Colorblindness Emulation](storybook-accessibility-addon-colorblindness-emulation.PNG)
-
-- Actions Addon
-
-![Actions Addon](storybook-actions-addon.PNG)
-
-- Notes Addon
-
-![Notes Addon](storybook-Documentation-Component.PNG)
-
-- Source Addon
-
-![Source Addon](storybook-storycode-addon.PNG)
-
-- Viewport Addon
-
-![Source Addon](storybook-viewport-addon.PNG)
-
-## Svelte + TailwindCSS + Storybook
-
-[Storybook](https://storybook.js.org/) is an open source tool for developing JavaScript UI
-components in isolation
-
-[Svelte](https://svelte.dev/) is a component framework that allows you to write highly-efficient,
-imperative code, that surgically updates the DOM to maintain performance.
-
-[TailwindCSS](https://tailwindcss.com) is a highly customizable, low-level CSS framework that gives
-you all of the building blocks you need to build bespoke designs without any annoying opinionated
-styles you have to fight to override.
-
-## Steps to build
-
-1. Clone this repo `git clone https://github.com/jerriclynsjohn/svelte-storybook-tailwind.git`
-2. Go to the directory `cd svelte-storybook-tailwind`
-3. Install dependencies `yarn`
-4. To develop your Svelte App: `yarn dev`
-5. To develop UI components independent of your app: `yarn stories`
-
-### Documentations
-
-1. Svelte - [API](https://svelte.dev/docs) and [Tutorial](https://svelte.dev/tutorial/)
-2. TailwindCSS - [Docs](https://tailwindcss.com/docs) and [Tutorial](https://tailwindcss.com/screencasts/)
-3. Storybook - [Docs](https://storybook.js.org/docs/basics/introduction/) and [Tutorial](https://www.learnstorybook.com/intro-to-storybook/svelte/en/get-started/)
-
-## Steps to build it all by yourself and some tips [Warning: It's lengthy]
-
-### Instantiate Svelte App
-
-- Start the template file using `npx degit sveltejs/template svelte-storybook-tailwind`
-- Go to the directory `cd svelte-storybook-tailwind`
-- Install dependencies `yarn`
-- Try run the svelte app `yarn dev`
-
-### Add Tailwind into the project
-
-- Install dependencies:
-   `yarn add -D tailwindcss @fullhuman/postcss-purgecss autoprefixer postcss  postcss-import svelte-preprocess`
-- Change the rollup config as shown:
-
-```javascript
-import svelte from 'rollup-plugin-svelte';
-import resolve from 'rollup-plugin-node-resolve';
-import commonjs from 'rollup-plugin-commonjs';
-import livereload from 'rollup-plugin-livereload';
-import { terser } from 'rollup-plugin-terser';
-import postcss from 'rollup-plugin-postcss';
-import autoPreprocess from 'svelte-preprocess';
-
-const production = !process.env.ROLLUP_WATCH;
-
-export default {
-    input: 'src/main.js',
-    output: {
-        sourcemap: true,
-        format: 'iife',
-        name: 'app',
-        file: 'public/bundle.js',
-    },
-    plugins: [
-        svelte({
-            preprocess: autoPreprocess({
-                postcss: true,
-            }),
-            // enable run-time checks when not in production
-            dev: !production,
-            // we'll extract any component CSS out into
-            // a separate file — better for performance
-            css: css => {
-                css.write('public/bundle.css');
-            },
-        }),
-        postcss({
-            extract: 'public/utils.css',
-        }),
-
-        // If you have external dependencies installed from
-        // npm, you'll most likely need these plugins. In
-        // some cases you'll need additional configuration —
-        // consult the documentation for details:
-        // https://github.com/rollup/rollup-plugin-commonjs
-        resolve({
-            browser: true,
-            dedupe: importee => importee === 'svelte' || importee.startsWith('svelte/'),
-        }),
-        commonjs(),
-
-        // Watch the `public` directory and refresh the
-        // browser on changes when not in production
-        !production && livereload('public'),
-
-        // If we're building for production (npm run build
-        // instead of npm run dev), minify
-        production && terser(),
-    ],
-    watch: {
-        clearScreen: false,
-    },
-};
-```
-
-- Add tailwind config using the command `npx tailwind init`
-
-- Add PostCSS config `./postcss.config.js` as follows:
-
-```javascript
-const production = !process.env.ROLLUP_WATCH;
-const purgecss = require('@fullhuman/postcss-purgecss');
-
-module.exports = {
-    plugins: [
-        require('postcss-import')(),
-        require('tailwindcss'),
-        require('autoprefixer'),
-        production &&
-            purgecss({
-                content: ['./**/*.html', './**/*.svelte'],
-                defaultExtractor: content => {
-                    const regExp = new RegExp(/[A-Za-z0-9-_:/]+/g);
-
-                    const matchedTokens = [];
-
-                    let match = regExp.exec(content);
-                    // To make sure that you do not lose any tailwind classes used in class directive.
-                    // https://github.com/tailwindcss/discuss/issues/254#issuecomment-517918397
-                    while (match) {
-                        if (match[0].startsWith('class:')) {
-                            matchedTokens.push(match[0].substring(6));
-                        } else {
-                            matchedTokens.push(match[0]);
-                        }
-
-                        match = regExp.exec(content);
-                    }
-
-                    return matchedTokens;
-                },
-            }),
-    ],
-};
-```
-
-- Build the project with some TailwindCSS utilities `yarn dev`
-
-### Add Storybook into the Svelte Project
-
-- Add Storybook dependencies `yarn add -D @storybook/svelte`
-- Add 5 commonly used Storybook [Addons](https://storybook.js.org/addons/):
-
-  - [Source](https://github.com/storybookjs/storybook/tree/master/addons/storysource):
-      `yarn add -D @storybook/addon-storysource`
-  - [Actions](https://github.com/storybookjs/storybook/tree/master/addons/actions):
-      `yarn add -D @storybook/addon-actions`
-  - [Notes](https://github.com/storybookjs/storybook/tree/master/addons/notes):
-      `yarn add -D @storybook/addon-notes`
-  - [Viewport](https://github.com/storybookjs/storybook/tree/master/addons/viewport):
-      `yarn add -D @storybook/addon-viewport`
-  - [Accessibility](https://github.com/storybookjs/storybook/tree/master/addons/a11y):
-      `yarn add @storybook/addon-a11y --dev`
-- Create an addon file at the root `.storybook/addons.js` with the following content and keep
-   adding additional addons in this file.
-
-```javascript
-import '@storybook/addon-storysource/register';
-import '@storybook/addon-actions/register';
-import '@storybook/addon-notes/register';
-import '@storybook/addon-viewport/register';
-import '@storybook/addon-a11y/register';
-```
-
-- Create a config file at the root `.storybook/config.js` with the following content:
-
-```javascript
-import { configure, addParameters, addDecorator } from '@storybook/svelte';
-import { withA11y } from '@storybook/addon-a11y';
-
-// automatically import all files ending in *.stories.js
-const req = require.context('../storybook/stories', true, /\.stories\.js$/);
-function loadStories() {
-    req.keys().forEach(filename => req(filename));
-}
-
-configure(loadStories, module);
-addDecorator(withA11y);
-addParameters({ viewport: { viewports: newViewports } });
-```
-
-- Add tailwind configs in the `webpack.config.js` under `.storybook` and also accommodate for Source addon:
-
-```javascript
-const path = require('path');
-
-module.exports = ({ config, mode }) => {
-    config.module.rules.push(
-        {
-            test: /\.css$/,
-            loaders: [
-                {
-                    loader: 'postcss-loader',
-                    options: {
-                        sourceMap: true,
-                        config: {
-                            path: './.storybook/',
-                        },
-                    },
-                },
-            ],
-
-            include: path.resolve(__dirname, '../storybook/'),
-        },
-        //This is the new block for the addon
-        {
-            test: /\.stories\.js?$/,
-            loaders: [require.resolve('@storybook/addon-storysource/loader')],
-            include: [path.resolve(__dirname, '../storybook')],
-            enforce: 'pre',
-        },
-    );
-
-    return config;
-};
-```
-
-- Create the `postcss.config.js` under `.storybook`:
-
-```javascript
-var tailwindcss = require('tailwindcss');
-
-module.exports = {
-    plugins: [
-        require('postcss-import')(),
-        tailwindcss('./tailwind.config.js'),
-        require('autoprefixer'),
-    ],
-};
-```
-
-- Make sure you have babel and svelte-loader dependencies
-   `yarn add -D babel-loader @babel/core svelte-loader`
-- Add npm script in your `package.json`
+...then start [Rollup](https://rollupjs.org):
 
 ```bash
-{
-    "scripts": {
-        // Rest of the scripts
-        "stories": "start-storybook",
-        "build-stories": "build-storybook"
-    }
-}
+npm run dev
 ```
 
-- Add a utils.css file under `storybook/css/` and make sure you `import 'utils.css'` in your
-   `stories.js` files:
+Navigate to [localhost:5000](http://localhost:5000). You should see your app running. Edit a component file in `src`, save it, and reload the page to see your changes.
 
-```css
-/* Import Tailwind as Global Utils */
+By default, the server will only respond to requests from localhost. To allow connections from other computers, edit the `sirv` commands in package.json to include the option `--host 0.0.0.0`.
 
-@import 'tailwindcss/base';
 
-@import 'tailwindcss/components';
+## Building and running in production mode
 
-@import 'tailwindcss/utilities';
+To create an optimised (production) version of the app:
+
+```bash
+npm run build
 ```
 
-- Write your Svelte component in `storybook\components` and yes you can use your regular `.svelte`
-   file. The only thing is that you cant use templates in a story yet, not supported, but yes you
-   can compose other components together. For the starter pack lets just create a clickable button.
+You can run the newly built app with `npm run start`. This uses [sirv](https://github.com/lukeed/sirv), which is included in your package.json's `dependencies` so that the app will work when you deploy to platforms like [Heroku](https://heroku.com).
 
-```html
-<script>
-    import { createEventDispatcher } from 'svelte';
-    export let text = '';
-    const dispatch = createEventDispatcher();
-    function onClick(event) {
-      dispatch('click', event);
-    }
-</script>
 
-<button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-        on:click={onClick}>
-  {text}
-</button>
+## Single-page app mode
+
+By default, sirv will only respond to requests that match files in `public`. This is to maximise compatibility with static fileservers, allowing you to deploy your app anywhere.
+
+If you're building a single-page app (SPA) with multiple routes, sirv needs to be able to respond to requests for *any* path. You can make it so by editing the `"start"` command in package.json:
+
+```js
+"start": "sirv public --single"
 ```
 
-- Write your stories in `storybook/stories` and you can name any number of story file with
-   `<anything>.stories.js`, for the starter package we can create stories of `Button` with the
-   readme notes at `<anything>.stories.md`. Note: reference the css here to make sure that tailwind
-   is called by postcss:
 
-```javascript
-import '../../css/utils.css';
+## Deploying to the web
 
-import { storiesOf } from '@storybook/svelte';
-import ButtonSimple from '../../components/buttons/button-simple.svelte';
-import markdownNotes from './buttons.stories.md';
+### With [now](https://zeit.co/now)
 
-storiesOf('Buttons | Buttons', module)
-    //Simple Button
-    .add(
-        'Simple',
-        () => ({
-            Component: ButtonSimple,
-            props: { text: 'Button' },
-            on: {
-                click: action('I am logging in the actions tab too'),
-            },
-        }),
-        { notes: { markdown: markdownNotes } },
-    )
+Install `now` if you haven't already:
+
+```bash
+npm install -g now
 ```
 
-- Write your own Documentation for the Component which will `<anything>.stories.md` :
+Then, from within your project folder:
 
-```md
-# Buttons
-
-_Examples of building buttons with Tailwind CSS._
-
----
-
-Tailwind doesn't include pre-designed button styles out of the box, but they're easy to build using
-existing utilities.
-
-Here are a few examples to help you get an idea of how to build components like this using Tailwind.
+```bash
+cd public
+now deploy --name my-project
 ```
 
-- Run your storyboard `yarn stories` and you'll see this:
+As an alternative, use the [Now desktop client](https://zeit.co/download) and simply drag the unzipped project folder to the taskbar icon.
 
-![Storybook UI](storybook-ui.PNG)
+### With [surge](https://surge.sh/)
 
-You can add more addons and play around with them.
+Install `surge` if you haven't already:
 
-That's a wrap!
+```bash
+npm install -g surge
+```
 
+Then, from within your project folder:
 
-## License
-[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fjerriclynsjohn%2Fsvelte-storybook-tailwind.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2Fjerriclynsjohn%2Fsvelte-storybook-tailwind?ref=badge_large)
+```bash
+npm run build
+surge public my-project.surge.sh
+```
