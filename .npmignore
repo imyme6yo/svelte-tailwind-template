@@ -1,0 +1,2 @@
+# Don't distribute the dependencies
+node_modules/
